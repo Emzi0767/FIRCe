@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Version>0.0.1.0-rc</Version>
+    <Authors>Alexander Horner, Emzi0767</Authors>
+    <Product>FIRCe</Product>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Copyright>2020 Alexander Horner, 2024 Emzi0767</Copyright>
+    <RepositoryUrl>https://github.com/Emzi0767/FIRCe.git</RepositoryUrl>
+    <RepositoryType>GIT</RepositoryType>
+    <PackageTags></PackageTags>
+    <PackageReleaseNotes>The initial Prerelease of FIRCe</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/Emzi0767/FIRCe</PackageProjectUrl>
+    <AssemblyVersion>0.0.1.0</AssemblyVersion>
+    <NeutralLanguage></NeutralLanguage>
+    <SignAssembly>false</SignAssembly>
+    <Description>FIRCe is a Free and Open Source IRC library, forked from smIRCL, a (sm)all (IRC) (L)ibrary, designed to provide core cuntionality for IRCv3 in a lightweight and self-sustaining manner. FIRCe will handle an IRC connection and session state for you with minimal input and output, and can provide a very simple to integrate base for simple bots, whilst exposing the required properties to implement more complex features with ease.</Description>
+    <LangVersion>11.0</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile></DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
