@@ -18,11 +18,11 @@ namespace FIRCe.EventArgs
         public ReadOnlyCollection<string> SeparatedArguments => new(_parts.Skip(1).ToList());
 
         private readonly List<string> _parts;
-        
+
         public ChannelCtcpMessageEventArgs(IrcController source, IrcMessage message)
         {
             if (message.Command.ToIrcLower() != "privmsg" || !source.IsValidChannelName(message.Parameters[0])) throw new ArgumentException("Not a channel PRIVMSG", nameof(message));
-            
+
             Author = source.Users.TryGetValue(message.SourceNick.ToIrcLower(), out IrcUser user) ? user : null;
             Channel = source.Channels.TryGetValue(message.Parameters[0].ToIrcLower(), out IrcChannel channel) ? channel : null;
             RawContent = message.Parameters[1].Trim('\x01');

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Timers;
 using FIRCe.Constants;
 using FIRCe.Enums;
@@ -121,29 +120,29 @@ namespace FIRCe.Core
         private void DoNextCapabilityCompletionStep()
         {
             if (!_capabilitySteps.Any()) return;
-            
+
             CapabilityStep nextStep = _capabilitySteps.Dequeue();
-            
+
             switch (nextStep)
             {
                 case CapabilityStep.Start:
                     Connector.Transmit("CAP LS :302");
                     break;
-                
+
                 case CapabilityStep.RequestCapabilities:
                     RequestCapabilities();
                     break;
-                
+
                 case CapabilityStep.RequestSaslAuthentication:
                     Connector.Transmit("AUTHENTICATE :PLAIN");
                     break;
-                
+
                 case CapabilityStep.End:
                     Connector.Transmit("CAP :END");
                     break;
             }
         }
-        
+
         /// <summary>
         /// Based on available capabilities, request the desired capabilities
         /// </summary>
@@ -177,11 +176,11 @@ namespace FIRCe.Core
                     capabilityRequest += capability.ToIrcLower();
                 }
             }
-            
+
             //Kick the capability negotiation process off
             if (capabilityRequest != "") Connector.Transmit($"CAP REQ :{capabilityRequest}");
         }
-        
+
         /// <summary>
         /// Join channels configured to be joined automatically
         /// </summary>
@@ -192,7 +191,7 @@ namespace FIRCe.Core
                 Join(channel);
             }
         }
-        
+
         /// <summary>
         /// When the connection is considered properly established (MOTD has been received or we have been notified one isn't available) consider the client ready
         /// </summary>
@@ -269,7 +268,7 @@ namespace FIRCe.Core
             }
 
             if (_channels.ContainsKey(channelName.ToIrcLower())) return;
-            
+
             Connector.Transmit($"JOIN :{channelName}");
             Connector.Transmit($"MODE :{channelName}");
         }
@@ -302,7 +301,7 @@ namespace FIRCe.Core
             else
             {
                 bool success = _users.TryGetValue(channelOrNick.ToIrcLower(), out IrcUser user);
-                
+
                 if (success)
                 {
                     user.LastPrivateMessage = DateTime.Now;
@@ -314,7 +313,7 @@ namespace FIRCe.Core
                         Nick = channelOrNick,
                         LastPrivateMessage = DateTime.Now
                     };
-                    
+
                     WhoIs(channelOrNick);
                 }
             }
@@ -339,7 +338,7 @@ namespace FIRCe.Core
             else
             {
                 bool success = _users.TryGetValue(channelOrNick.ToIrcLower(), out IrcUser user);
-                
+
                 if (success)
                 {
                     user.LastPrivateMessage = DateTime.Now;
@@ -351,15 +350,15 @@ namespace FIRCe.Core
                         Nick = channelOrNick,
                         LastPrivateMessage = DateTime.Now
                     };
-                    
+
                     WhoIs(channelOrNick);
                 }
             }
 
             Connector.Transmit($"NOTICE {channelOrNick} :{message}");
         }
-        
-        
+
+
         /// <summary>
         /// Send a CTCP response message
         /// </summary>

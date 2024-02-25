@@ -10,7 +10,7 @@ namespace FIRCe.Examples
             Console.WriteLine("1. Connect to Libera Chat respond to hello");
 
             Console.Write("\n> ");
-            
+
             bool selectionSuccess = Int32.TryParse(Console.ReadLine(), out int selection);
 
             switch (!selectionSuccess ? 0 : selection)
@@ -18,7 +18,7 @@ namespace FIRCe.Examples
                 case 1:
                     Example1.Run();
                     break;
-                
+
                 default:
                     Console.WriteLine("Invalid selection");
                     break;

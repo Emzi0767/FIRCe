@@ -29,7 +29,7 @@ namespace FIRCe.Core
         /// A list of channels currently joined by the client (internal)
         /// </summary>
         private readonly Dictionary<string, IrcChannel> _channels = new();
-        
+
 
         /// <summary>
         /// The Nick of the client
@@ -86,7 +86,7 @@ namespace FIRCe.Core
         /// The MOTD of the connected server, if one is available
         /// </summary>
         public string ServerMotd { get; internal set; }
-        
+
         /// <summary>
         /// Whether the client is ready to handle operations
         /// </summary>

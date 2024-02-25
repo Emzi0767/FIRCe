@@ -11,17 +11,17 @@ namespace FIRCe.ServerEntities
     public class IrcChannel
     {
         protected readonly IrcController SourceController;
-        
+
         /// <summary>
         /// The name of the channel
         /// </summary>
         public string Name { get; internal set; }
-        
+
         /// <summary>
         /// The topic of the channel
         /// </summary>
         public string Topic { get; internal set; }
-        
+
         /// <summary>
         /// The modes and their parameters set on the channel
         /// </summary>
@@ -30,7 +30,7 @@ namespace FIRCe.ServerEntities
         /// The modes and their parameters set on the channel (internal)
         /// </summary>
         protected internal readonly List<KeyValuePair<char, string>> ModesInternal = new();
-        
+
         /// <summary>
         /// The modes set on the client in this channel
         /// </summary>
@@ -39,7 +39,7 @@ namespace FIRCe.ServerEntities
         /// The modes set on the client in this channel (internal)
         /// </summary>
         protected internal readonly List<char> ClientModesInternal = new();
-        
+
         /// <summary>
         /// The users in the channel
         /// </summary>
@@ -48,7 +48,7 @@ namespace FIRCe.ServerEntities
         /// The users in the channel (internal)
         /// </summary>
         protected internal readonly List<string> UsersInternal = new();
-        
+
         /// <summary>
         /// Whether the Users collection has been fully populated yet
         /// </summary>
@@ -63,11 +63,11 @@ namespace FIRCe.ServerEntities
         public IrcChannel(IrcController sourceController, string name, List<char> supportedChannelTypes)
         {
             if (!IsValidName(name, supportedChannelTypes)) throw new ArgumentException("Not a valid channel name", nameof(name));
-            
+
             SourceController = sourceController;
             Name = name;
         }
-        
+
         /// <summary>
         /// Checks if a given string forms a valid channel name
         /// </summary>
@@ -103,7 +103,7 @@ namespace FIRCe.ServerEntities
         {
             SourceController.SendNotice(Name, message);
         }
-        
+
         /// <summary>
         /// Send a private CTCP message to the IRC channel
         /// </summary>

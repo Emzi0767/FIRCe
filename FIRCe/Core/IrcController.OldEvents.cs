@@ -10,13 +10,13 @@ namespace FIRCe.Core
         /// <param name="controller">The controller handling the message</param>
         /// <param name="message">The message received</param>
         public delegate void IrcMessageHandler(IrcController controller, IrcMessage message);
-        
+
         /// <summary>
         /// The handler for disconnects
         /// </summary>
         /// <param name="controller">The controller who's connector died</param>
         public delegate void ControllerDisconnectedHandler(IrcController controller);
-        
+
         /// <summary>
         /// The handler for readying
         /// </summary>
@@ -38,7 +38,7 @@ namespace FIRCe.Core
         /// Fired when the internal connector dies
         /// </summary>
         public event ControllerDisconnectedHandler Disconnected;
-        
+
         /// <summary>
         /// Fired when the controller is ready
         /// </summary>

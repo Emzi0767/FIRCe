@@ -16,7 +16,7 @@ namespace FIRCe.Core
         private void PingHandler(IrcController controller, IrcMessage message)
         {
             Connector.Transmit($"PONG :{message.Parameters[0]}");
-            
+
             try
             {
                 Ping?.Invoke(controller, message);
@@ -33,14 +33,14 @@ namespace FIRCe.Core
                 }
             }
         }
-        
+
         /// <summary>
         /// Processes a PRIVMSG command
         /// </summary>
         private void PrivMsgHandler(IrcController controller, IrcMessage message)
         {
             bool isChannel = controller.IsValidChannelName(message.Parameters[0]);
-            
+
             if (!isChannel)
             {
                 if (_users.TryGetValue(message.SourceNick.ToIrcLower(), out IrcUser user))
@@ -57,11 +57,11 @@ namespace FIRCe.Core
                         UserName = message.SourceUserName,
                         LastPrivateMessage = DateTime.Now
                     });
-                    
+
                     WhoIs(message.SourceNick);
                 }
             }
-            
+
             try
             {
                 if (message.Parameters[1].StartsWith("\x01"))
@@ -99,14 +99,14 @@ namespace FIRCe.Core
                 }
             }
         }
-        
+
         /// <summary>
         /// Processes a NOTICE command
         /// </summary>
         private void NoticeHandler(IrcController controller, IrcMessage message)
         {
             bool isChannel = controller.IsValidChannelName(message.Parameters[0]);
-            
+
             if (!isChannel)
             {
                 if (_users.TryGetValue(message.SourceNick.ToIrcLower(), out IrcUser user))
@@ -123,11 +123,11 @@ namespace FIRCe.Core
                         UserName = message.SourceUserName,
                         LastPrivateMessage = DateTime.Now
                     });
-                    
+
                     WhoIs(message.SourceNick);
                 }
             }
-            
+
             try
             {
                 if (isChannel)
@@ -151,7 +151,7 @@ namespace FIRCe.Core
                 }
             }
         }
-        
+
         /// <summary>
         /// Processes an ERROR command
         /// </summary>
@@ -159,7 +159,7 @@ namespace FIRCe.Core
         {
             Connector.Dispose();
         }
-        
+
         /// <summary>
         /// Process one of these commands:
         ///     431 ERR_NONICKNAMEGIVEN
@@ -171,7 +171,7 @@ namespace FIRCe.Core
         {
             //If the current nick is null, we have no nickname and should try others, quitting in the worst case. If it isn't null, we have a nickname and this error was from attempting to change nick
             if (Nick != null) return;
-            
+
             if (Connector.Config.AlternativeNicks.Count > 0)
             {
                 _unconfirmedNick = Connector.Config.AlternativeNicks.Dequeue();
@@ -182,7 +182,7 @@ namespace FIRCe.Core
                 Quit("Unable to find a usable Nick");
             }
         }
-        
+
         /// <summary>
         /// Process a NICK command
         /// </summary>
@@ -199,7 +199,7 @@ namespace FIRCe.Core
 
             WhoIs(message.Parameters[0]);
         }
-        
+
         /// <summary>
         /// Process a 004 RPL_MYINFO command. Receiving this command confirms the nick we requested is now ours
         /// </summary>
@@ -209,7 +209,7 @@ namespace FIRCe.Core
             _unconfirmedNick = null;
             WhoIs(Nick);
         }
-        
+
         /// <summary>
         /// Process a 372 RPL_MOTD command
         /// </summary>
@@ -225,7 +225,7 @@ namespace FIRCe.Core
                 ServerMotd += "\n" + message.Parameters[1];
             }
         }
-        
+
         /// <summary>
         /// Process a 376 RPL_ENDOFMOTD command. Receiving this command is considered indication that connection establishment is complete, so the client will indicate it is ready
         /// </summary>
@@ -234,7 +234,7 @@ namespace FIRCe.Core
             //TODO if a manual MOTD is fired, should we really be Ready() ing?
             ControllerReady(); //Now safe to assume ISupport has been received and processed
         }
-        
+
         /// <summary>
         /// Process a 422 ERR_NOMOTD command. Receiving this command is considered indication that connection establishment is complete, so the client will indicate it is ready
         /// </summary>
@@ -243,7 +243,7 @@ namespace FIRCe.Core
             //TODO if a manual MOTD is fired, should we really be Ready() ing?
             ControllerReady(); //Now safe to assume ISupport has been received and processed
         }
-        
+
         /// <summary>
         /// Process a 352 RPL_WHOREPLY command
         /// </summary>
@@ -258,7 +258,7 @@ namespace FIRCe.Core
                 RealName = message.Parameters[7].Split(new[] { ' ' }, 2)[1];
 
                 if (!_channels.TryGetValue(message.Parameters[1].ToIrcLower(), out IrcChannel channel)) return;
-                
+
                 channel.ClientModesInternal.Clear();
 
                 foreach (char status in statuses)
@@ -313,7 +313,7 @@ namespace FIRCe.Core
                 }
             }
         }
-        
+
         /// <summary>
         /// Process a 311 RPL_WHOISUSER command
         /// </summary>
@@ -332,7 +332,7 @@ namespace FIRCe.Core
                 user.RealName = message.Parameters[5];
             }
         }
-        
+
         /// <summary>
         /// Process a 319 RPL_WHOISCHANNELS command
         /// </summary>
@@ -342,18 +342,18 @@ namespace FIRCe.Core
             {
                 string[] channels = message.Parameters[2].Split(' ');
                 List<string> trimmedChannels = new List<string>();
-                
+
                 foreach (string channel in channels) trimmedChannels.Add(channel.TrimStart('@', '+'));
 
                 foreach (string channel in trimmedChannels)
                 {
                     if (!_channels.ContainsKey(channel.ToIrcLower())) continue;
-                    
+
                     if (user.MutualChannels.All(uch => uch != channel.ToIrcLower())) user.MutualChannelsInternal.Add(channel.ToIrcLower());
                 }
             }
         }
-        
+
         /// <summary>
         /// Process a 396 RPL_HOSTHIDDEN command
         /// </summary>
@@ -361,13 +361,13 @@ namespace FIRCe.Core
         {
             Host = message.Parameters[1];
         }
-        
+
         /// <summary>
         /// Process a JOIN commmand
         /// </summary>
         private void JoinHandler(IrcController controller, IrcMessage message)
         {
-            if(message.SourceNick.ToIrcLower() == Nick.ToIrcLower()) //If the target user is us
+            if (message.SourceNick.ToIrcLower() == Nick.ToIrcLower()) //If the target user is us
             {
                 if (!_channels.ContainsKey(message.Parameters[0].ToIrcLower())) _channels.Add(message.Parameters[0].ToIrcLower(), new IrcChannel(this, message.Parameters[0], SupportedChannelTypes)); //Add to our channel list if it isn't on there already
             }
@@ -398,26 +398,26 @@ namespace FIRCe.Core
                         RealName = realName,
                         IdentifiedAccount = identifiedAccount
                     };
-                    
+
                     newUser.MutualChannelsInternal.Add(message.Parameters[0].ToIrcLower()); //This is the first time we know of the user, so we initialise them with the current mutual channel as their only known mutual
                     newUser.MutualChannelModesInternal.Add(new KeyValuePair<string, List<char>>(message.Parameters[0].ToIrcLower(), new List<char>()));
-                    
+
                     _users.Add(message.SourceNick.ToIrcLower(), newUser);
-                    
+
                     WhoIs(message.SourceNick); //Get more info on the user
                 }
 
                 if (_channels.TryGetValue(message.Parameters[0].ToIrcLower(), out IrcChannel channel)) channel.UsersInternal.Add(message.SourceNick);
             }
         }
-        
+
         /// <summary>
         /// Process a 353 RPL_NAMREPLY command
         /// </summary>
         private void NamesReplyHandler(IrcController controller, IrcMessage message)
         {
             if (!_channels.TryGetValue(message.Parameters[2].ToIrcLower(), out IrcChannel channel)) return;
-            
+
             if (channel.UserCollectionComplete)
             {
                 channel.UserCollectionComplete = false;
@@ -431,7 +431,7 @@ namespace FIRCe.Core
                 string userHostMaskOrNickOnly = user.TrimStart(_trimmableUserPrefixes.ToArray());
                 string userHost = null;
                 string userUserName = null;
-                
+
                 string[] detailsAndHost = userHostMaskOrNickOnly.Split('@');
                 if (detailsAndHost.Length > 1) userHost = detailsAndHost[1];
 
@@ -444,7 +444,7 @@ namespace FIRCe.Core
                 {
                     //Add nick to user list
                     channel.UsersInternal.Add(userNick);
-                    
+
                     //Get user prefixes
                     List<char> userPrefixes = new List<char>();
                     string userSplice = user;
@@ -452,7 +452,7 @@ namespace FIRCe.Core
                     foreach (char trimmableUserPrefix in _trimmableUserPrefixes)
                     {
                         if (!userSplice.StartsWith(trimmableUserPrefix.ToString())) continue;
-                        
+
                         userPrefixes.Add(trimmableUserPrefix);
                         userSplice = userSplice.TrimStart(trimmableUserPrefix);
                     }
@@ -469,7 +469,7 @@ namespace FIRCe.Core
                     if (_users.TryGetValue(userNick.ToIrcLower(), out IrcUser globalUser))
                     {
                         if (globalUser.MutualChannels.All(ch => ch != channel.Name.ToIrcLower())) globalUser.MutualChannelsInternal.Add(channel.Name.ToIrcLower());
-                        
+
                         if (globalUser.MutualChannelModes.All(ch => ch.Key.ToIrcLower() != channel.Name.ToIrcLower())) globalUser.MutualChannelModesInternal.Add(new KeyValuePair<string, List<char>>(channel.Name, userModes));
                     }
                     else
@@ -481,10 +481,10 @@ namespace FIRCe.Core
                             Host = userHost,
                             UserName = userUserName
                         };
-                        
+
                         newUser.MutualChannelsInternal.Add(channel.Name.ToIrcLower());
                         newUser.MutualChannelModesInternal.Add(new KeyValuePair<string, List<char>>(channel.Name.ToIrcLower(), userModes));
-                        
+
                         _users.Add(userNick.ToIrcLower(), newUser);
                     }
                 }
@@ -501,7 +501,7 @@ namespace FIRCe.Core
                             userSplice = userSplice.TrimStart(trimmableUserPrefix);
                         }
                     }
-                    
+
                     channel.ClientModesInternal.Clear();
 
                     foreach (char prefix in userPrefixes)
@@ -511,7 +511,7 @@ namespace FIRCe.Core
                 }
             }
         }
-        
+
         /// <summary>
         /// Process a 366 RPL_ENDOFNAMES command
         /// </summary>
@@ -521,14 +521,14 @@ namespace FIRCe.Core
 
             Who(message.Parameters[1]);
         }
-        
+
         /// <summary>
         /// Process a 324 RPL_CHANNELMODEIS command
         /// </summary>
         private void ChannelModesHandler(IrcController controller, IrcMessage message)
         {
             if (!_channels.TryGetValue(message.Parameters[1].ToIrcLower(), out IrcChannel channel)) return;
-            
+
             char[] channelModes = message.Parameters[2].TrimStart('+').ToCharArray(); //TODO what if this is - ?
             Queue<string> channelModeParameters = new Queue<string>();
 
@@ -555,14 +555,14 @@ namespace FIRCe.Core
                 }
             }
         }
-        
+
         /// <summary>
         /// Process a MODE command
         /// </summary>
         private void ModeHandler(IrcController controller, IrcMessage message)
         {
             if (!_channels.TryGetValue(message.Parameters[0].ToIrcLower(), out IrcChannel channel)) return;
-            
+
             char[] sentModes = message.Parameters[1].ToCharArray();
             bool removal = false;
 
@@ -577,7 +577,7 @@ namespace FIRCe.Core
                     removal = false;
                     continue;
                 }
-                    
+
                 if (sentMode == '-')
                 {
                     removal = true;
@@ -591,13 +591,13 @@ namespace FIRCe.Core
                 else if (SupportedChannelModes.B.Contains(sentMode) || SupportedChannelModes.C.Contains(sentMode)) //B or C type chanmode?
                 {
                     channel.ModesInternal.RemoveAll(m => m.Key == sentMode); //If removal, remove, otherwise, dedupe (technically remove all, but added again below)
-                        
+
                     if (!removal) channel.ModesInternal.Add(new KeyValuePair<char, string>(sentMode, otherParams.Dequeue()));
                 }
                 else if (SupportedChannelModes.D.Contains(sentMode)) //D type chanmode?
                 {
                     channel.ModesInternal.RemoveAll(m => m.Key == sentMode); //If removal, remove, otherwise, dedupe (technically remove all, but added again below)
-                        
+
                     if (!removal) channel.ModesInternal.Add(new KeyValuePair<char, string>(sentMode, null));
                 }
                 else if (SupportedUserPrefixes.Any(sup => sup.Key == sentMode)) //Channel specific usermode?
@@ -607,7 +607,7 @@ namespace FIRCe.Core
                     if (Nick.ToIrcLower() == targetNick.ToIrcLower()) //If the target user is us
                     {
                         channel.ClientModesInternal.RemoveAll(m => m == sentMode); //If removal, remove, otherwise, dedupe (technically remove all, but added again below)
-                            
+
                         if (!removal) channel.ClientModesInternal.Add(sentMode);
                     }
                     else //If we know of the existence of the target user and it is not us
@@ -615,41 +615,41 @@ namespace FIRCe.Core
                         if (_users.TryGetValue(targetNick.ToIrcLower(), out IrcUser user))
                         {
                             KeyValuePair<string, List<char>> mutualChannelModes = user.MutualChannelModes.FirstOrDefault(mcm => mcm.Key.ToIrcLower() == channel.Name.ToIrcLower()); //Find the mutual channel for the known user
-                                
+
                             mutualChannelModes.Value?.RemoveAll(m => m == sentMode); //If removal, remove, otherwise, dedupe (technically remove all, but added again below)
-                                
+
                             if (!removal) mutualChannelModes.Value?.Add(sentMode);
                         }
                     }
                 }
             }
         }
-        
+
         /// <summary>
         /// Process a PART command
         /// </summary>
         private void PartHandler(IrcController controller, IrcMessage message)
         {
             string lowerNamedChannel = message.Parameters[0].ToIrcLower();
-            
+
             if (message.SourceNick.ToIrcLower() == Nick.ToIrcLower())
             {
                 _channels.Remove(lowerNamedChannel);
 
                 IEnumerable<KeyValuePair<string, IrcUser>> usersWithMutualChannels = _users.Where(u => u.Value.MutualChannels.Any(ch => ch == lowerNamedChannel));
-                
+
                 foreach (KeyValuePair<string, IrcUser> user in usersWithMutualChannels) user.Value.MutualChannelsInternal.RemoveAll(ch => ch == lowerNamedChannel);
             }
             else
             {
-                if (_channels.TryGetValue(lowerNamedChannel, out IrcChannel channel))  channel.UsersInternal.RemoveAll(u => u == message.SourceNick.ToIrcLower());
+                if (_channels.TryGetValue(lowerNamedChannel, out IrcChannel channel)) channel.UsersInternal.RemoveAll(u => u == message.SourceNick.ToIrcLower());
 
                 if (_users.TryGetValue(message.SourceNick.ToIrcLower(), out IrcUser user)) user.MutualChannelsInternal.RemoveAll(ch => ch == lowerNamedChannel);
             }
 
             DoUserGarbageCollection();
         }
-        
+
         /// <summary>
         /// Process a KICK command
         /// </summary>
@@ -660,7 +660,7 @@ namespace FIRCe.Core
                 _channels.Remove(message.Parameters[0].ToIrcLower());
 
                 IEnumerable<KeyValuePair<string, IrcUser>> usersWithMutualChannels = _users.Where(u => u.Value.MutualChannels.Any(ch => ch.ToIrcLower() == message.Parameters[0].ToIrcLower()));
-                
+
                 foreach (KeyValuePair<string, IrcUser> user in usersWithMutualChannels)
                 {
                     user.Value.MutualChannelsInternal.RemoveAll(ch => ch == message.Parameters[0].ToIrcLower());
@@ -675,21 +675,21 @@ namespace FIRCe.Core
 
             DoUserGarbageCollection();
         }
-        
+
         /// <summary>
         /// Process a QUIT command
         /// </summary>
         private void QuitHandler(IrcController controller, IrcMessage message)
         {
             if (message.SourceNick.ToIrcLower() == Nick.ToIrcLower()) return;
-            
+
             IEnumerable<KeyValuePair<string, IrcChannel>> mutualChannels = _channels.Where(ch => ch.Value.UsersInternal.Any(u => u == message.SourceNick.ToIrcLower()));
-            
+
             foreach (KeyValuePair<string, IrcChannel> mutualChannel in mutualChannels) mutualChannel.Value.UsersInternal.RemoveAll(u => u == message.SourceNick.ToIrcLower());
 
             _users.Remove(message.SourceNick.ToIrcLower());
         }
-        
+
         /// <summary>
         /// Process a 332 RPL_TOPIC command
         /// </summary>
@@ -697,7 +697,7 @@ namespace FIRCe.Core
         {
             if (_channels.TryGetValue(message.Parameters[1].ToIrcLower(), out IrcChannel channel)) channel.Topic = message.Parameters[2];
         }
-        
+
         /// <summary>
         /// Process a TOPIC command
         /// </summary>
@@ -705,7 +705,7 @@ namespace FIRCe.Core
         {
             if (_channels.TryGetValue(message.Parameters[0].ToIrcLower(), out IrcChannel channel)) channel.Topic = message.Parameters[1] != "" ? message.Parameters[1] : null;
         }
-        
+
         /// <summary>
         /// Process a 005 RPL_ISUPPORT command
         /// </summary>
@@ -739,7 +739,7 @@ namespace FIRCe.Core
                             switch (currentChanModeGroup)
                             {
                                 case 0:
-                                    chanModeList = SupportedChannelModes.A; 
+                                    chanModeList = SupportedChannelModes.A;
                                     break;
                                 case 1:
                                     chanModeList = SupportedChannelModes.B;
@@ -775,7 +775,7 @@ namespace FIRCe.Core
                 }
             }
         }
-        
+
         /// <summary>
         /// Process a CAP command
         /// </summary>
@@ -809,7 +809,7 @@ namespace FIRCe.Core
                     break;
             }
         }
-        
+
         /// <summary>
         /// Process an AUTHENTICATE command
         /// </summary>
@@ -823,7 +823,7 @@ namespace FIRCe.Core
                     break;
             }
         }
-        
+
         /// <summary>
         /// Process a 903 RPL_SASLSUCCESS command
         /// </summary>
@@ -831,7 +831,7 @@ namespace FIRCe.Core
         {
             DoNextCapabilityCompletionStep();
         }
-        
+
         /// <summary>
         /// Process one of these commands:
         ///     901 RPL_LOGGEDOUT
@@ -845,7 +845,7 @@ namespace FIRCe.Core
         {
             Quit("SASL authentication has failed");
         }
-        
+
         /// <summary>
         /// Process an AWAY command
         /// </summary>
@@ -858,11 +858,11 @@ namespace FIRCe.Core
             else
             {
                 if (!_users.TryGetValue(message.SourceNick.ToIrcLower(), out IrcUser user)) return;
-                
+
                 user.Away = message.Parameters.Count == 0 ? null : message.Parameters[0];
             }
         }
-        
+
         /// <summary>
         /// Process a CHGHOST command
         /// </summary>
@@ -876,7 +876,7 @@ namespace FIRCe.Core
             else
             {
                 if (!_users.TryGetValue(message.SourceNick.ToIrcLower(), out IrcUser user)) return;
-                
+
                 user.UserName = message.Parameters[0];
                 user.HostMask = message.Parameters[1];
             }
